@@ -2,14 +2,15 @@
   "team": "K5-L3B-DAY10-NguyenAnh-PoCtoPilotGate1",
   "members": [
     "LeThanhNguyen-2A202603733",
-    "LeHaiAnh-2A202603986"
+    "LeHaiAnh-2A202603986",
+    "NguyenMinhDuc-2A202603960"
   ],
-  "incident": "",
+  "incident": "S4",
   "decision_v1": "Tiếp tục",
-  "decision_v2": "",
+  "decision_v2": "Tiếp tục",
   "three_lines": {
-    "environment_assumption": "",
-    "reduce_or_prevent": "",
-    "measure_in_pilot": ""
+    "environment_assumption": "Đội giả định nhà cung cấp LLM duy trì tỷ lệ sẵn sàng cao và khi gặp lỗi nghẽn mạng thì nhân viên CSKH luôn có mặt đúng giờ để tiếp nhận các ca chuyển duyệt kịp thời trong vòng 60 phút.",
+    "reduce_or_prevent": "Cổng write_gate và giới hạn vận hành NGĂN hẳn tác hại ghi oan hãng và vượt ngân sách nhờ cơ chế kiểm tra độc lập ngoài model, đồng thời việc tăng ca trực 2 người ngăn chặn triệt để tình trạng vỡ SLA hàng chờ.",
+    "measure_in_pilot": "Cần đo đạc lại thời gian phản hồi thực tế của nhân viên CSKH trên hệ thống ticketing thật, tỷ lệ khiếu nại phát sinh từ đối tác vận chuyển và chi phí token API thực tế trong các khung giờ cao điểm."
   }
 }

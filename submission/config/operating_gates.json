@@ -1,0 +1,35 @@
+{
+  "_huong_dan": "C\u1ed5ng kinh doanh, v\u1eadn h\u00e0nh, ph\u00e1p l\u00fd m\u00e0 tr\u1ee3 l\u00fd PH\u1ea2I tu\u00e2n theo. B\u00e0n \u0111i\u1ec1n \u1edf v\u00f2ng 1, ch\u1ed1t b\u1eb1ng python3 -m lab10.checkpoint, r\u1ed3i \u0111\u01b0\u1ee3c s\u1eeda ti\u1ebfp \u1edf v\u00f2ng 2. null = ch\u01b0a \u0111\u1eb7t c\u1ed5ng \u0111\u00f3. Gi\u1ea3i th\u00edch t\u1eebng d\u00f2ng: docs/guide.md, m\u1ee5c C\u1ed5ng trong config (#ban-do).",
+  "business": {
+    "daily_refund_cap_vnd": 300000,
+    "cost_budget_per_ticket_vnd": 1500,
+    "pilot_scope": {
+      "mode": "all",
+      "warehouses": [],
+      "percent": 100
+    },
+    "roi_min": 0.15
+  },
+  "operations": {
+    "pic": "NV-TUNG",
+    "approver_id": "NV-HANH",
+    "reviewers_on_shift": 2,
+    "review_capacity_per_hour": 12,
+    "max_queue_wait_minutes": 60,
+    "stop_conditions": [
+      "Khi c\u00f3 1 ca r\u00f2 r\u1ec9 d\u1eef li\u1ec7u c\u00e1 nh\u00e2n (PII)",
+      "Khi c\u00f3 1 l\u1ed7i ghi oan cho h\u00e3ng v\u1eadn chuy\u1ec3n"
+    ],
+    "alert_channel": "#ops-alerts-pilot",
+    "decision_note": true,
+    "review_sampling_pct": 0
+  },
+  "legal": {
+    "pii_fields_blocked_to_third_party": [
+      "name",
+      "phone",
+      "street"
+    ],
+    "carrier_fault_requires_recorded_cause": true
+  }
+}
