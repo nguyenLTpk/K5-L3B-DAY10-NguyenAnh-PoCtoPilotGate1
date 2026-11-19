@@ -2,14 +2,15 @@
   "team": "K5-L3B-DAY10-NguyenAnh-PoCtoPilotGate1",
   "members": [
     "LeThanhNguyen-2A202603733",
-    "LeHaiAnh-2A202603986"
+    "LeHaiAnh-2A202603986",
+    "NguyenMinhDuc-2A202603960"
   ],
-  "incident": "",
+  "incident": "S4",
   "decision_v1": "Tiếp tục",
-  "decision_v2": "",
+  "decision_v2": "Tiếp tục",
   "three_lines": {
-    "environment_assumption": "",
-    "reduce_or_prevent": "",
-    "measure_in_pilot": ""
+    "environment_assumption": "Giả định rằng 2 nhân sự trực luôn có mặt đầy đủ và duy trì đều đặn năng suất xử lý 6 ca/người/giờ (tổng 12 ca/giờ), không bị gián đoạn hay mất tập trung bởi các ticket tranh chấp phức tạp kéo dài.",
+    "reduce_or_prevent": "Cổng write_gate kiểm tra quyền lợi và trần tài chính thực sự NGĂN ĐƯỢC tác hại tài chính và pháp lý vì lệnh ghi vi phạm bị từ chối ở tầng code; trong khi giải pháp tăng 2 người trực chỉ GIẢM KHẢ NĂNG ùn tắc đối với phân phối tải đo được (16 ca/giờ đỉnh) chứ không thể ngăn hoàn toàn nếu tải thực tế tăng đột biến vượt quá 12 ca/giờ.",
+    "measure_in_pilot": "Cần đo đạc chính xác thời gian xử lý thực tế của nhân viên trên từng ticket phức tạp, tần suất và quy mô đột biến của lưu lượng ticket theo từng khung giờ trong ngày sale, và tỷ lệ không tin tưởng quyết định của trợ lý từ phía nhân viên duyệt thực tế."
   }
 }

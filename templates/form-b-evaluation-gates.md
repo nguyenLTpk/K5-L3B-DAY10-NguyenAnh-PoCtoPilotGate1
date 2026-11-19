@@ -268,11 +268,11 @@ Số người trực duyệt mỗi ca: 1 · Mỗi giờ duyệt được: 6 ca �
 
 | Câu hỏi | Trả lời (có số, có tên) |
 |---|---|
-| Giờ cao điểm là khi nào, bao nhiêu ticket mỗi giờ (dựa vào `ops_facts`)? | Khung giờ 20h–22h các ngày siêu sale; lượng ticket ước tính đạt 15–20 ticket/giờ (gấp 3 lần bình thường). |
-| Ai trực giờ cao điểm, mấy người (khớp `operations.reviewers_on_shift`)? | Ca trực gồm 2 người: Trần Thị Hạnh (`NV-HANH`) và 1 nhân viên CSKH tăng cường. |
-| Ngưỡng nào thì **gọi thêm người** (hàng chờ bao nhiêu ca, chờ lâu nhất bao nhiêu phút)? Ai gọi? | Hàng chờ vượt quá 5 ca hoặc thời gian chờ ca lâu nhất chạm mốc 30 phút. Người gọi: Trưởng ca Trần Thị Hạnh (`NV-HANH`). |
-| Ngưỡng nào thì **thu hẹp** phạm vi (khoá `business.pilot_scope`) hoặc **tắt** một thao tác ghi (`config/switches.json`)? Ai quyết? | Khi thời gian chờ vượt 45 phút hoặc tỷ lệ chuyển duyệt > 40%. Người quyết định: Lê Thanh Tùng (`NV-TUNG`). |
-| Thêm người thì chi phí mỗi ticket và ROI thay đổi thế nào (đọc report)? | Thêm 1 người trực tốn phí giữ chỗ 30.000đ/ca; chi phí mỗi ticket tăng nhẹ (~500đ) nhưng đảm bảo SLA không bị ùn tắc hàng chờ. |
+| Giờ cao điểm là khi nào, bao nhiêu ticket mỗi giờ (dựa vào `ops_facts`)? | Khung giờ 20h–22h các ngày sale/chiến dịch lớn (như 11.11); lượng ticket ước tính đạt 15–20 ticket/giờ (gấp 3 lần ngày thường), trong đó tỷ lệ chuyển người duyệt tăng lên ~51.2% (16 ca/giờ). |
+| Ai trực giờ cao điểm, mấy người (khớp `operations.reviewers_on_shift`)? | Bố trí 2 người trực trên một ca: Trần Thị Hạnh (`NV-HANH`, approver đứng tên) và 1 nhân viên CSKH tăng cường (`NV-TUNG` điều phối), đảm bảo tổng công suất duyệt 12 ca/giờ. |
+| Ngưỡng nào thì **gọi thêm người** (hàng chờ bao nhiêu ca, chờ lâu nhất bao nhiêu phút)? Ai gọi? | Khi monitor `peak_hour_review_count` > 12 ca/giờ hoặc hàng chờ có thời gian chờ tối đa `queue_wait_max_min` > 30 phút (hoặc tích lũy >= 4 ticket đang chờ). Người kích hoạt điều động on-call: Trần Thị Hạnh (`NV-HANH`). |
+| Ngưỡng nào thì **thu hẹp** phạm vi (khoá `business.pilot_scope`) hoặc **tắt** một thao tác ghi (`config/switches.json`)? Ai quyết? | Khi thời gian chờ chạm ngưỡng SLA `queue_wait_max_min` >= 45 phút mà không có người tăng cường, hoặc xuất hiện >= 1 ca `queue_stuck`: chuyển `"issue_refund": "off"` hoặc thu hẹp scope sang kho ít tải (`{"mode": "warehouses", "warehouses": ["CT"]}`). Người quyết định: Lê Thanh Tùng (`NV-TUNG`). |
+| Thêm người thì chi phí mỗi ticket và ROI thay đổi thế nào (đọc report)? | Chi phí mỗi ticket tăng từ 5.130đ (1 người trực) lên 7.296đ (2 người trực) nhưng vẫn dưới trần 8.500đ và rẻ hơn làm tay (10.000đ); ROI giảm từ 0.95 xuống 0.37 (vẫn vượt xa ngưỡng tối thiểu 0.15); đổi lại loại bỏ triệt để 5 ca ùn tắc và giảm thời gian chờ lâu nhất từ 82 phút xuống 15 phút. |
 
 ---
 
