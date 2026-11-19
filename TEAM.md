@@ -58,13 +58,31 @@ Sản phẩm và kinh doanh; câu 1.1, 1.6 (Phiếu A mục A1, A4), câu 2.3, 2
 
 ### Đóng góp cụ thể
 
-- (điền sau phần B)
+- Phần B sau khi nhận thẻ S4: phụ trách thực hiện và tổng hợp các công việc dưới đây với hỗ trợ của Codex, theo lượt làm gộp phần sản phẩm/kinh doanh và kỹ thuật đã thống nhất trong nhóm.
+- Phân tích card S4 và report trước sửa; dò S4-07@11, S4-08@11/22/33, đối chiếu thêm S4-05@11 và S4-33@11 để xác định các nhánh hoàn sai, ghi lỗi oan cho hãng, vượt ngân sách và quá tải duyệt. Phân biệt việc chuyển hàng vỡ sang người là đúng nghiệp vụ với lỗi chờ quá SLA.
+- Điều chỉnh `business.daily_refund_cap_vnd` từ 2.000.000 xuống 300.000đ/ngày theo ngân sách ngày sale. Đo riêng thay đổi này: hoàn tự động giảm còn 292.000đ/ngày, nhưng hàng chờ tăng lên 6 ca ùn và chờ tối đa 86 phút.
+- Điều chỉnh `operations.reviewers_on_shift` từ 1 lên 2 và `review_capacity_per_hour` từ 6 lên 12 ca/giờ; giữ SLA 60 phút, kiểm mẫu 10%, ghi chú quyết định và phạm vi pilot 100%. Kiểm chứng hàng chờ còn 0 ca ùn, chờ tối đa 15 phút, chi phí S4 7.296đ/ticket và ROI 0,37.
+- Sửa `write_gate` trong `lab10/guards.py` để trần hoàn tự động trong ngày chỉ áp dụng khi không có `approval_id`, tránh chặn nhầm khoản có phê duyệt vì trần tự động. Giữ các cổng kiểm quyền lợi và quy lỗi hãng theo tracking DB của vòng 1.
+- Thêm và đăng ký monitor `peak_hour_review_count` trong `lab10/monitors.py`, đếm số ca cần duyệt cao nhất theo giờ đến, tách riêng seed và ngày. Ghi công thức, ngưỡng cảnh báo và điểm mù; giá trị ở after: bộ nền 1, S4 16 ca/giờ.
+- Thực hiện đánh giá sau từng thay đổi, kiểm regression bộ nền và hash file khóa; bổ sung 10 test cho monitor và trần ngân sách, chạy 13 test công khai; xử lý các phát hiện từ review độc lập. Kết quả cuối PASS-VISIBLE, không regression, hoàn sai/ghi oan hãng/PII đều bằng 0; chưa có test ẩn trên máy.
+- Hoàn thiện Phiếu C các mục C0, C1, C2, C4, C5, C6, C8, C9 bằng mã chạy và số liệu thực tế; chưa chốt C7, C10, C11, C12, quyết định v2 hoặc gom bài cuối.
+- Viết hướng dẫn bàn giao chi tiết cho Đức và cập nhật `.gitignore` cho tài liệu, test và log tham khảo cục bộ; giữ các file nguồn và thành phần bài nộp bắt buộc.
 
 ### Bằng chứng
 
-- (mã commit, mã lần chạy, dòng trong phiếu: điền sau phần B)
+- Mã commit cho phần xử lý B/S4: `c7eac27` — `fix: handle S4 refund budget and peak review load` (nhánh `haianh`, tác giả MSSV `2A202603986`); gồm code guard/monitor, config ngân sách/năng lực duyệt, Phiếu C và `.gitignore`. Phần tổng hợp đóng góp và exit ticket trong `TEAM.md` được lưu ở commit hồ sơ tiếp theo.
+- Grade trước sửa: `R-S4-grade-20261119-183557-d6f9c7` — còn vượt ngân sách, hàng chờ và chưa có monitor mới.
+- Thử riêng trần 300.000đ: `R-S4-after-20261119-183734-3b3fff`; thử năng lực 2 người/12 ca mỗi giờ: `R-S4-after-20261119-183741-496088`; kiểm bộ nền: `R-base-after-20261119-183745-496088`.
+- Grade cuối: `R-S4-grade-20261119-184336-c4c041` — PASS-VISIBLE (chưa chạy test ẩn); integrity, criteria, visible, regression và monitor đều đạt.
+- Ba mốc S4 cuối: base `R-S4-before-20261119-184340-c4c041`; prepared `R-S4-prepared-20261119-184341-c4c041`; after `R-S4-after-20261119-184341-c4c041`. Report và nhật ký hiện ở `runs/`, cần được gom vào `submission/` ở bước nộp bài.
+- Code/config: `lab10/guards.py`, `lab10/monitors.py`, `config/operating_gates.json`; báo cáo: `templates/form-c-incident.md` mục C0/C1/C2/C4/C5/C6/C8/C9; quy tắc file tham khảo: `.gitignore`.
+- Kiểm thử đã thực hiện: `python -m unittest discover -s tests` (13 test đạt), `python -m unittest discover -s docs/s4-audit -p test_s4.py` (10 test đạt), `python -m lab10.grade --incident S4`, `git diff --check`. Test bổ sung và hướng dẫn bàn giao là file tham khảo cục bộ đã gitignore, không phải thành phần bắt buộc của bài nộp.
+
+### Sử dụng AI
+
+- Dùng Codex hỗ trợ đọc code và card S4, phân tích trace/report, triển khai thay đổi config/guard/monitor, chạy test và audit, soạn nội dung Phiếu C, hướng dẫn bàn giao và exit ticket. Nội dung đóng góp phần B được tổng hợp theo yêu cầu của Lê Hải Anh; các con số và quyết định cuối cần được nhóm hiểu, kiểm tra và giải thích khi demo theo `RULES.md`.
 
 ### Exit ticket
 
-- Một điều học được: (điền cuối buổi)
-- Một điều còn chưa chắc: (điền cuối buổi)
+- Một điều học được: Một cổng bảo vệ ngân sách có thể chuyển rủi ro sang hàng chờ của người duyệt. Trong S4, hạ trần hoàn tự động từ 2.000.000 xuống 300.000đ giúp giữ tổng hoàn ở 292.000đ/ngày nhưng làm chờ tối đa tăng từ 82 lên 86 phút; cần đồng thời cấp đủ năng lực duyệt. Khi tăng lên 2 người/12 ca mỗi giờ, thời gian chờ giảm còn 15 phút, không còn ca ùn, trong khi chi phí 7.296đ/ticket và ROI 0,37 vẫn đạt ngưỡng. Vì vậy phải đánh giá cả tiền, con người và SLA sau mỗi thay đổi, không chỉ nhìn pass_rate.
+- Một điều còn chưa chắc: Hai người với công suất giả định 12 ca/giờ có đủ trong pilot thật khi ca phức tạp mất nhiều thời gian hơn hoặc một người vắng mặt hay không. Monitor vẫn đo được đỉnh 16 ca cần duyệt/giờ trên S4; cần đo lại tải đến, thời gian phục vụ và mức nhân sự thực tế để chốt ngưỡng gọi thêm người hoặc thu hẹp, thay vì coi kết quả mock là bảo đảm cho mọi mức tải.
