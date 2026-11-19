@@ -14,7 +14,7 @@ Họ tên đầy đủ và MSSV của **mọi** thành viên; bàn 3 người th
 | STT | Họ và tên | MSSV | Vai | Trưởng nhóm |
 | --: | --------- | ---- | --- | :---------: |
 |   1 | Lê Thành Nguyên | 2A202603733 | Kỹ sư cổng | x |
-|   2 |           |      | Sản phẩm và kinh doanh |             |
+|   2 | Lê Hải Anh | 2A202603986 | Sản phẩm và kinh doanh |             |
 |   3 |           |      | Vận hành và pháp lý |             |
 |   4 |           |      |     |             |
 
@@ -49,3 +49,22 @@ Kỹ sư cổng (Gate Engineer) và Trưởng nhóm; phụ trách chạy đánh 
 
 - Một điều học được: Phải niêm phong tiêu chí chấp nhận bằng cryptographic hash trước khi đo lường để đảm bảo tính khách quan; cổng an toàn (guardrail) cần thiết kế theo nhiều tầng (pre-guard và write-gate) kết hợp giữa code và giới hạn vận hành.
 - Một điều còn chưa chắc: Cách cân đối tối ưu giữa tỉ lệ can thiệp của người duyệt (escalation rate) và chi phí vận hành khi gặp các tình huống tranh chấp dữ liệu giữa các bên thứ ba.
+
+## LeHaiAnh-2A202603986
+
+### Phần việc phụ trách
+
+Sản phẩm và kinh doanh; câu 1.1, 1.6 (Phiếu A mục A1, A4), câu 2.3, 2.9 và quyết định v1 (Phiếu B mục B3, B7.4, B8), câu 3.2, phần `business` của câu 3.5 và quyết định v2 (Phiếu C mục C5, C7, C12); file `config/acceptance_criteria.json`, `config/operating_gates.json` mục `business`.
+
+### Đóng góp cụ thể
+
+- (điền sau phần B)
+
+### Bằng chứng
+
+- (mã commit, mã lần chạy, dòng trong phiếu: điền sau phần B)
+
+### Exit ticket
+
+- Một điều học được: (điền cuối buổi)
+- Một điều còn chưa chắc: (điền cuối buổi)
