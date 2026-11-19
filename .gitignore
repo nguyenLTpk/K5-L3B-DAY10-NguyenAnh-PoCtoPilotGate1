@@ -7,3 +7,7 @@ __pycache__/
 
 # Local planning and review artifacts; not lab submission
 /docs/superpowers/
+
+# Codex reference handoff and supplemental audit tests (keep locally)
+/docs/S4-HANDOFF.md
+/docs/s4-audit/
