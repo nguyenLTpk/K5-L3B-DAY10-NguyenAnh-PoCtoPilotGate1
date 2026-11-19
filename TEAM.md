@@ -41,9 +41,9 @@ Kỹ sư cổng (Gate Engineer) và Trưởng nhóm; phụ trách chạy đánh 
 
 ### Bằng chứng
 
-- Mã commit: (đang cập nhật)
-- Mã lần chạy: (đang cập nhật)
-- Các câu trong phiếu: A2 (câu 1.3), B1 (câu 2.1), B2 (câu 2.2), B7.1–B7.3 (câu 2.6–2.8), B8.
+- Mã commit: `40ac3a0` (Ký tiêu chí), `cb8927e` (Phiếu A), `14f9970` (Chốt vòng 1 & Phiếu B)
+- Mã lần chạy: `R-base-before-20261119-151442-bde05c` (baseline), `R-base-after-20261119-151630-a89d4b` (thử cổng), `R-base-prepared-20261119-151655-a89d4b` (prepared)
+- Các câu trong phiếu: A2 (câu 1.3), B1 (câu 2.1), B2 (câu 2.2), B7.1–B7.3 (câu 2.6–2.8), B8 (Quyết định v1).
 
 ### Exit ticket
 
