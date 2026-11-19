@@ -19,7 +19,17 @@ def escalation_rate(trials):
     return sum(t["status"] == "escalated" for t in trials) / max(1, len(trials))
 
 
+def peak_hour_review_count(trials):
+    counts = {}
+    for trial in trials:
+        if trial.get("review_kind") and trial.get("arrive_min") is not None:
+            key = (trial["seed"], trial["day"], trial["arrive_min"] // 60)
+            counts[key] = counts.get(key, 0) + 1
+    return max(counts.values(), default=0)
+
+
 MONITORS = {
     "escalation_rate": escalation_rate,     # có sẵn; KHÔNG tính là metric mới của đội
+    "peak_hour_review_count": peak_hour_review_count,
 }
 STARTER_MONITORS = ("escalation_rate",)

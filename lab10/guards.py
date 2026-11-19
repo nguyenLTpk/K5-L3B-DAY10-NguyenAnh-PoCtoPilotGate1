@@ -39,7 +39,7 @@ def write_gate(ctx, action):
         # Cổng 2A (Kinh doanh): Kiểm tra trần hoàn tiền tự động trong ngày
         cap = (ctx.gates or {}).get("business", {}).get("daily_refund_cap_vnd")
         spent = ctx.tools.auto_refund_today_vnd()
-        if cap is not None and spent + action.get("amount_vnd", 0) > cap:
+        if cap is not None and not action.get("approval_id") and spent + action.get("amount_vnd", 0) > cap:
             return Verdict.escalate("Vượt trần ngân sách hoàn tiền tự động trong ngày")
 
         # Cổng 2B (Kinh doanh): Trần hoàn tiền cho một khách hàng trong ngày
