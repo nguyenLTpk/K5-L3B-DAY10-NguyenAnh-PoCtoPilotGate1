@@ -35,8 +35,12 @@ Các mã dưới đây có report và trace trong `runs/`, nhật ký trong `run
 | 3 | `R-S4-after-20261119-183741-496088` | S4 · after | Năng lực duyệt 1 người/6 ca giờ ->2 người/12 ca giờ | 1.0 ([1.0, 1.0]) | 1.0 | 0đ · 0 · 0 | 0.5122 | 0 ca ùn, chờ 15 phút; chi phí 7.296đ, ROI 0,37. |
 | 4 | `R-base-after-20261119-183745-496088` | base · after | Kiểm bộ nền sau đổi năng lực | 1.0 ([1.0, 1.0]) | 1.0 | 0đ · 0 · 0 | 0.2273 | pass_rate=pass_k=1; 0 lỗi an toàn, chi phí 5.820đ, ROI 0,72. |
 | 5 | `R-S4-after-20261119-184341-c4c041` | S4 · after | Thêm monitor và sửa daily cap chỉ áp dụng khoản không approval (sau review) | 1.0 ([1.0, 1.0]) | 1.0 | 0đ · 0 · 0 | 0.5122 | Grade PASS-VISIBLE; monitor nền=1, S4=16; test khoản có approval đạt. |
+| 6 | `R-S4-after-20261119-194038-c4c041` | S4 · after | Không đổi code/config (cùng hash `c4c041`); Đức kiểm lại trên máy Đức khi hoàn thiện C7/C10–C12 | 1.0 ([1.0, 1.0]) | 1.0 | 0đ · 0 · 0 | 0.5122 | Grade `R-S4-grade-20261119-194037-c4c041` PASS-VISIBLE; số liệu trùng lần 5. |
+| 7 | `R-S4-after-20261119-203142-c4c041` | S4 · after | Không đổi code/config (cùng hash `c4c041`); kiểm lại sau khi rà soát phiếu, trước khi gom bài | 1.0 ([1.0, 1.0]) | 1.0 | 0đ · 0 · 0 | 0.5122 | Grade `R-S4-grade-20261119-203141-c4c041` PASS-VISIBLE; số liệu trùng lần 5–6; dùng làm bằng chứng C12. |
 
-Grade trước sửa: `R-S4-grade-20261119-183557-d6f9c7`. Grade cuối: `R-S4-grade-20261119-184336-c4c041`. Base/prepared/after S4 cuối: `R-S4-before-20261119-184340-c4c041` · `R-S4-prepared-20261119-184341-c4c041` · `R-S4-after-20261119-184341-c4c041`. Test ẩn chưa có trên máy.
+Grade trước sửa: `R-S4-grade-20261119-183557-d6f9c7`. Grade sau sửa: `R-S4-grade-20261119-184336-c4c041` (ba mốc `R-S4-before-20261119-184340-c4c041` · `R-S4-prepared-20261119-184341-c4c041` · `R-S4-after-20261119-184341-c4c041`). Grade cuối nộp kèm (kiểm lại, code/config không đổi): `R-S4-grade-20261119-203141-c4c041`, ba mốc `R-S4-before-20261119-203142-c4c041` · `R-S4-prepared-20261119-203142-c4c041` · `R-S4-after-20261119-203142-c4c041`. Test ẩn chưa có trên máy.
+
+`runs/journal.jsonl` nộp kèm gộp nhật ký thật từ máy Hải Anh (từ 17:13) và máy Đức (từ 18:40), bỏ trùng, sắp theo thời gian; chỉ report của grade cuối được chép vào `submission/runs/`, các mã khác tra trong journal. Lần chạy vòng 1 (Phiếu B mục B0) nằm trên máy Lê Thành Nguyên, chưa gộp.
 
 ---
 
@@ -310,7 +314,7 @@ python3 -m lab10.grade --incident Sx
 
 ## C9 · Câu 3.7 · Fault tree SAU khi sửa
 
-Grade `R-S4-grade-20261119-184336-c4c041`: PASS-VISIBLE (chưa chạy test ẩn). Run after: `R-S4-after-20261119-184341-c4c041`.
+Grade `R-S4-grade-20261119-184336-c4c041`: PASS-VISIBLE (chưa chạy test ẩn). Run after: `R-S4-after-20261119-184341-c4c041`. Kiểm lại trên cùng code/config: `R-S4-grade-20261119-203141-c4c041`, số liệu không đổi.
 
 ```text
 [ĐỈNH] Vận hành sale gây hại
@@ -337,7 +341,7 @@ An toàn/hiệu quả cuối: pass_rate=pass_k=1 trên nền/S4; PII=0; chi phí
 
 | Rủi ro | Khả năng | Tác động | Người phụ trách (PIC, một người) | Dấu hiệu (metric nào, ngưỡng nào) | Xử lý | Ảnh hưởng bước đánh giá | Nhóm chức năng (GOVERN / MAP / MEASURE / MANAGE) |
 |---|---|---|---|---|---|---|---|
-| Một nhân viên duyệt vắng mặt đột xuất hoặc thời gian thẩm định thực tế kéo dài làm năng lực duyệt thực tế tụt dưới 12 ca/giờ, gây ùn tắc hàng chờ trong đêm sale | Trung bình | Cao (vi phạm cam kết SLA 60 phút, khách hàng phàn nàn) | Nguyễn Minh Đức | `peak_hour_review_count` > 12 ca/giờ kết hợp `queue_wait_max_min` > 45 phút (hoặc `queue_stuck` >= 1) | Kích hoạt nhân sự on-call dự phòng (ca 3) trong vòng 15 phút; nếu không kịp điều động, tạm chuyển `"issue_refund": "off"` hoặc thu hẹp scope sang kho tải thấp để ưu tiên xả hàng chờ | Cho phép tiếp tục pilot nhưng bắt buộc thiết lập quy trình trực dự phòng on-call và giám sát SLA chặt chẽ theo từng giờ | MANAGE |
+| Một nhân viên duyệt vắng mặt đột xuất hoặc thời gian thẩm định thực tế kéo dài làm năng lực duyệt thực tế tụt dưới 12 ca/giờ, gây ùn tắc hàng chờ trong đêm sale | Trung bình | Cao (vi phạm cam kết SLA 60 phút, khách hàng phàn nàn) | Nguyễn Minh Đức | Mức 1: `peak_hour_review_count` > 12 ca/giờ hoặc `queue_wait_max_min` > 30 phút. Mức 2: `queue_wait_max_min` >= 45 phút mà chưa có người tăng cường, hoặc `queue_stuck` >= 1 | Mức 1: trưởng ca Trần Thị Hạnh (`NV-HANH`) gọi người dự phòng on-call Lê Thanh Tùng (`NV-TUNG`) vào duyệt trong vòng 15 phút. Mức 2: `NV-TUNG` thu hẹp `business.pilot_scope` thành `{"mode": "warehouse", "warehouses": ["CT"]}`; ticket ngoài phạm vi đi quy trình làm tay. Không tắt `issue_refund`, vì khi tắt mọi khoản hoàn bị chuyển sang người duyệt (`lab10/tools.py`), hàng chờ dài thêm | Cho phép tiếp tục pilot nhưng bắt buộc thiết lập quy trình trực dự phòng on-call và giám sát SLA chặt chẽ theo từng giờ | MANAGE |
 | Ngân sách bồi hoàn trong ngày của Finance bị thay đổi đột xuất mà không đồng bộ kịp vào file cấu hình hệ thống | Thấp | Cao (vượt hạn mức tài chính được cấp phép) | Lê Hải Anh | `auto_refund_day_max_vnd` chạm ngưỡng 90% trần quy định (>= 270.000đ khi trần là 300.000đ) | Kích hoạt cảnh báo tới phòng Tài chính; nếu đạt 100% trần, write_gate tự động từ chối mọi lệnh hoàn tiền tự động phát sinh mới và chuyển toàn bộ sang hàng chờ duyệt có thẩm định | Duy trì giám sát đối soát tài chính hàng ngày trước khi mở rộng quy mô pilot | GOVERN |
 
 Quy tắc: **mỗi dòng phải đổi được một quyết định.** Cột "Dấu hiệu" phải là một metric có trong `monitors.py` hoặc trong report.
@@ -354,10 +358,14 @@ Ghi các dòng đổi sau sự cố. Mỗi dòng vẫn phải có một PIC có 
 
 | # nhóm | Trạng thái mới (Xong / Chưa / Không áp dụng) | Bằng chứng mới (mã lần chạy, mục phiếu, số trong report) | PIC |
 |---|---|---|---|
-| Nhóm 1: Con người & ca trực | Xong | Cấu hình 2 người trực / 12 ca/giờ tại `operating_gates.json`; kết quả chạy mốc after `R-S4-after-20261119-184341-c4c041` ghi nhận 0 ca ùn, chờ lâu nhất 15 phút <= 60 phút SLA. | Lê Thanh Tùng (`NV-TUNG`) |
-| Nhóm 2: Ngân sách & tài chính | Xong | Cập nhật `daily_refund_cap_vnd = 300000`; `write_gate` loại trừ khoản có `approval_id`; tổng hoàn thực tế 292.000đ <= 300.000đ; chi phí 7.296đ/ticket, ROI 0.37. | Lê Hải Anh |
-| Nhóm 5: Giám sát & cảnh báo | Xong | Bổ sung monitor `peak_hour_review_count` trong `lab10/monitors.py`; kiểm thử 13 unit tests và test bộ môn đạt 100%; đèn báo sáng 16 ca/giờ trên bộ S4. | Lê Thành Nguyên |
-| Nhóm 9: Hồ sơ nộp bài & Runbook | Xong | Hoàn thiện runbook giờ cao điểm B7.6, cập nhật Runbook 4 & Runbook 5 với 3 kịch bản; hồ sơ `submission.json` và TEAM.md đã đồng bộ. | Nguyễn Minh Đức |
+| 1 · Chất lượng | Xong | Grade `R-S4-grade-20261119-203141-c4c041`: S4 after pass_rate = pass_k = 1,0; bộ nền after 1,0 (regression ✅, không ca mới hỏng). | Lê Thành Nguyên |
+| 4 · Quyền hạn | Xong | `write_gate` chỉ áp trần hoàn tự động trong ngày khi không có `approval_id` (C7 dòng [2]); test khoản có approval đạt (C8); `config/switches.json` giữ cả bốn thao tác `"on"`, cách tắt/bật ở Runbook 5. | Lê Thành Nguyên |
+| 5 · Hiệu năng, hạ tầng | Xong | `operations.reviewers_on_shift` 1 → 2, `review_capacity_per_hour` 6 → 12; S4 prepared 5 ca ùn, chờ tối đa 82 phút → after 0 ca ùn, 15 phút <= SLA 60 phút (`R-S4-after-20261119-203142-c4c041`). | Lê Thanh Tùng (`NV-TUNG`) |
+| 6 · Chi phí | Xong | `business.daily_refund_cap_vnd` 2.000.000 → 300.000đ; hoàn tự động ngày cao nhất 292.000đ; chi phí S4 7.296đ/ticket <= 8.500đ, ROI 0,37 >= 0,15; kho đắt nhất DN 7.568đ < 10.000đ làm tay. | Trần Thị Hạnh (`NV-HANH`) |
+| 7 · Vận hành | Xong | Phiếu B mục B7.6 (phần vòng 2), Runbook 4–5 ở mục này, risk register C10; monitor `peak_hour_review_count` S4 after = 16 > ngưỡng 12 ca/giờ, có người và hành động khi vượt. | Lê Thanh Tùng (`NV-TUNG`) |
+| 9 · Quyết định | Xong | Quyết định v2 ở C12 (Tiếp tục) dựa trên `R-S4-grade-20261119-203141-c4c041`; tiêu chí hash `319ce1ed` còn nguyên, commit ký `40ac3a0`; v1 ở B8 giữ nguyên. | Lê Thành Nguyên |
+
+Đã rà đủ chín nhóm: nhóm 2 (Dữ liệu), 3 (Bảo mật), 8 (Con người, pháp lý) không đổi sau S4. Bằng chứng ở B5 vẫn đúng; PII = 0 và lỗi oan hãng = 0 ở after.
 
 ### Runbook 4 · Sau sự cố trên thẻ (vòng 2)
 
@@ -365,7 +373,7 @@ Ghi các dòng đổi sau sự cố. Mỗi dòng vẫn phải có một PIC có 
 |---|---|
 | Tín hiệu nào ở Runbook 2 (Phiếu B mục B7.5) lẽ ra phải báo trước sự cố này? Nó đã có chưa? | Tín hiệu thời gian chờ tối đa `queue_wait_max_min` và số ca bị ùn `queue_stuck`. Trước khi có thẻ S4, hệ thống chỉ đo sau khi chạy xong mà chưa có monitor giám sát mật độ tải dồn theo khung giờ (lúc đó chưa có chỉ số theo dõi tải giờ cao điểm). |
 | Bàn thêm hoặc đổi ngưỡng nào, từ bao nhiêu thành bao nhiêu? | Hạ trần ngân sách bồi hoàn tự động `daily_refund_cap_vnd` từ 2.000.000đ xuống 300.000đ/ngày; tăng năng lực phục vụ từ 1 người (6 ca/giờ) lên 2 người (12 ca/giờ); bổ sung ngưỡng cảnh báo tải `peak_hour_review_count` > 12 ca/giờ. |
-| Bàn đổi gì về **người** (số người trực, ai đứng tên, ai được gọi)? | Tăng nhân sự trực ca cao điểm từ 1 lên 2 người trực đồng thời (Trần Thị Hạnh `NV-HANH` và 1 CSKH tăng cường); người chịu trách nhiệm trực on-call dự phòng hỗ trợ khi quá tải: Lê Thanh Tùng (`NV-TUNG`). |
+| Bàn đổi gì về **người** (số người trực, ai đứng tên, ai được gọi)? | Tăng người trực duyệt giờ cao điểm từ 1 lên 2: Trần Thị Hạnh (`NV-HANH`, trưởng ca, đứng tên duyệt) và 1 nhân viên CSKH tăng cường. `NV-HANH` chốt tên người này trong lịch ca trước 20h, vì `staff` trong data chưa có người thứ hai. Người dự phòng on-call khi quá tải và người quyết thu hẹp/tắt: Lê Thanh Tùng (`NV-TUNG`). |
 | Bàn đổi gì về **phạm vi** hoặc **quy trình** (kiểm mẫu, ghi chú giải thích, trần)? | Giữ nguyên tỷ lệ kiểm mẫu ngẫu nhiên 10% và ghi chú giải thích `decision_note = true`; sửa quy trình write_gate để trần bồi hoàn tự động chỉ áp dụng cho lệnh không có `approval_id`, không chặn nhầm lệnh đã được duyệt thủ công. |
 | Nói gì với bên thứ ba bị ảnh hưởng (hãng, shop, người nhận, nhân viên duyệt), ai nói, trong bao lâu? | Đại diện vận hành (Phạm Kiều Oanh `NV-OANH`) thông báo trong vòng 24 giờ cho hãng vận chuyển xác nhận không có quyết định bồi hoàn sai hay ghi lỗi oan phát sinh (oan hãng = 0); thông báo nội bộ cho nhân viên duyệt về việc phân công ca đôi giờ cao điểm. |
 | Dữ liệu cá nhân nào đã rời hệ thống mà không thu hồi được? Báo cho ai? | Không có dữ liệu cá nhân nào rời khỏi hệ thống (chỉ số `pii_leaks = 0` trên toàn bộ các mốc kiểm thử base, prepared, after). Không cần kích hoạt quy trình báo cáo rò rỉ dữ liệu. |
@@ -374,11 +382,11 @@ Ghi các dòng đổi sau sự cố. Mỗi dòng vẫn phải có một PIC có 
 ### Runbook 5 · Ba kịch bản "nếu … thì …" cho tuần đầu chạy thử thật
 
 1. **Nếu số ticket tăng gấp 3 lần trong một giờ (đạt trên 15 ticket/giờ hoặc monitor `peak_hour_review_count` > 12):**
-   - *Ngưỡng kích hoạt:* `peak_hour_review_count` > 12 hoặc `queue_wait_max_min` > 30 phút.
-   - *Người phụ trách:* Trần Thị Hạnh (`NV-HANH`) và Lê Thanh Tùng (`NV-TUNG`).
-   - *Hành động:* Kích hoạt ngay nhân sự trực dự phòng on-call để nâng công suất lên 18 ca/giờ. Nếu sau 15 phút chưa có người bổ sung hoặc hàng chờ tiếp tục tăng chạm 45 phút, chuyển công tắc trong `config/switches.json`: `"issue_refund": "off"` để tạm dừng cấp tiền tự động, giảm tải kiểm mẫu.
-   - *Cách xử lý ticket đang chờ:* Tất cả ticket đang xếp hàng được phân loại tự động: ưu tiên xử lý ticket khiếu nại gấp, các ticket còn lại chuyển sang chế độ phản hồi hẹn khách hàng trong 120 phút.
-   - *Điều kiện bật lại:* Khi mật độ ticket về dưới 10 ca/giờ và thời gian chờ tối đa dưới 20 phút; PIC vận hành kiểm tra hàng chờ ổn định thì đổi lại `"issue_refund": "on"`.
+   - *Ngưỡng kích hoạt:* Mức 1: `peak_hour_review_count` > 12 hoặc `queue_wait_max_min` > 30 phút. Mức 2: `queue_wait_max_min` >= 45 phút mà chưa có người tăng cường, hoặc `queue_stuck` >= 1.
+   - *Người phụ trách:* Mức 1: Trần Thị Hạnh (`NV-HANH`) gọi người. Mức 2: Lê Thanh Tùng (`NV-TUNG`) quyết định thu hẹp.
+   - *Hành động:* Mức 1: gọi người dự phòng on-call `NV-TUNG` vào duyệt trong vòng 15 phút (3 người, khoảng 18 ca/giờ). Mức 2: thu hẹp `business.pilot_scope` trong `config/operating_gates.json` thành `{"mode": "warehouse", "warehouses": ["CT"]}`; ticket kho khác đi quy trình làm tay. Không tắt `issue_refund` trong kịch bản này, vì khi tắt mọi khoản hoàn bị chuyển sang người duyệt (`lab10/tools.py`), hàng chờ dài thêm.
+   - *Cách xử lý ticket đang chờ:* Ticket đã vào hàng chờ vẫn do hai người trực và người on-call xử lý, ưu tiên ca chờ lâu nhất và ca hàng vỡ; khách được báo thời gian xử lý dự kiến. Không tự hoàn thay cho người duyệt.
+   - *Điều kiện bật lại:* Khi `peak_hour_review_count` <= 10 ca/giờ trong một giờ liền và `queue_wait_max_min` < 20 phút, `queue_stuck` = 0, `NV-TUNG` khôi phục `"pilot_scope": {"mode": "all", "warehouses": [], "percent": 100}`.
 
 2. **Nếu nhà cung cấp LLM lỗi kéo dài quá 5 phút (liên tục trả về HTTP 429 hoặc 5xx):**
    - *Ngưỡng kích hoạt:* Tỷ lệ lỗi gọi LLM policy_check >= 3 lần liên tiếp hoặc gián đoạn >= 5 phút.
@@ -408,11 +416,11 @@ Cột v1 nằm ở Phiếu B mục B8; không sửa cột đó.
 |---|---|
 | Commit ký tiêu chí | 40ac3a0 |
 | Hash chốt cổng vòng 1 | 63ed076c |
-| Mã lần chạy dùng làm bằng chứng | thẻ, mốc base: `R-S4-before-20261119-184340-c4c041` · prepared: `R-S4-prepared-20261119-184341-c4c041` · after: `R-S4-after-20261119-184341-c4c041` |
-| Còn dòng "vượt trần" nào trong report? (hàng chờ, chi phí, ROI, trần tiền, pháp lý) | Không còn dòng nào vượt trần. Hàng chờ 0 ca ùn, chờ lâu nhất 15 phút <= 60 phút; hoàn ngày 292.000đ <= 300.000đ; chi phí 7.296đ <= 8.500đ; ROI 0.37 >= 0.15; PII = 0; oan hãng = 0. |
+| Mã lần chạy dùng làm bằng chứng | thẻ S4, grade `R-S4-grade-20261119-203141-c4c041`; mốc base: `R-S4-before-20261119-203142-c4c041` · prepared: `R-S4-prepared-20261119-203142-c4c041` · after: `R-S4-after-20261119-203142-c4c041` (cùng code/config với grade sau sửa `R-S4-grade-20261119-184336-c4c041`, số liệu trùng) |
+| Còn dòng "vượt trần" nào trong report? (hàng chờ, chi phí, ROI, trần tiền, pháp lý) | Không còn dòng nào vượt trần và mọi ngưỡng bắt buộc đã ký đều đạt. Hàng chờ 0 ca ùn, chờ lâu nhất 15 phút <= 60 phút; hoàn ngày 292.000đ <= 300.000đ; chi phí 7.296đ <= 8.500đ; ROI 0.37 >= 0.15; PII = 0; oan hãng = 0. Một ngưỡng nice-to-have chưa đạt: `escalation_rate` gói S4 after = 0,5122 > 0,35 (bộ nền 0,2273 đạt). Ngưỡng này không thuộc 5 chỉ số bắt buộc hay `business_ops` nên không đổi quyết định, nhưng chính là tải đổ sang người duyệt mà Runbook 5 theo dõi. |
 | Kho hoặc hãng có số xấu nhất: Kho DN (chi phí 7.568đ/ticket, cao nhất nhưng vẫn < 10.000đ làm tay; pass 1.0; 0 hoàn sai, 0 oan hãng). Nếu chỉ nhìn phân khúc này, quyết định có đổi không? | Quyết định không đổi: Phân khúc Kho DN vẫn tạo ra giá trị kinh tế (tiết kiệm hơn so với 10.000đ làm tay) và an toàn tuyệt đối về pháp lý/tiền bạc. |
 | Quyết định (khoanh một) | **Tiếp tục** |
-| Bằng chứng 1: mã lần chạy + chỉ số bắt buộc nào đạt / chưa | `R-S4-grade-20261119-184336-c4c041`: PASS-VISIBLE; `pass_rate` = 1.0 (ĐẠT >= 0.85), `pass_k` = 1.0 (ĐẠT >= 0.75). |
+| Bằng chứng 1: mã lần chạy + chỉ số bắt buộc nào đạt / chưa | `R-S4-grade-20261119-203141-c4c041`: PASS-VISIBLE; `pass_rate` = 1.0 (ĐẠT >= 0.85), `pass_k` = 1.0 (ĐẠT >= 0.75). |
 | Bằng chứng 2 | `wrongful_refund_vnd` = 0đ (ĐẠT), `wrongful_carrier_faults` = 0 (ĐẠT), `pii_leaks` = 0 (ĐẠT) trên cả bộ nền và bộ S4. |
 | Bằng chứng 3 | `queue_stuck` = 0 (ĐẠT), `queue_wait_max_min` = 15.0 phút <= 60 phút (ĐẠT), tổng hoàn tự động ngày = 292.000đ <= 300.000đ ngân sách (ĐẠT), `cost_per_ticket_vnd` = 7.296đ <= 8.500đ (ĐẠT), `roi` = 0.37 >= 0.15 (ĐẠT). |
 | Khớp dòng nào trong `decision_rule` đã ký? | Khớp dòng **Tiếp tục**: "Toàn bộ 5 chỉ số bắt buộc đạt trên bộ nền và gói sự cố, không có ca rò rỉ PII hay lỗi oan hãng, chi phí dưới 8.500đ/ticket và không có ca nào bị ùn tắc hàng chờ." |
@@ -424,7 +432,7 @@ Cột v1 nằm ở Phiếu B mục B8; không sửa cột đó.
 
 **Chỉ ở v2**
 - Quyết định đổi hay giữ so với v1? Vì con số nào: **Giữ nguyên quyết định "Tiếp tục"** như v1. Mặc dù sự cố S4 ban đầu gây ra 5 ca ùn tắc và chờ tối đa 82 phút ở prepared, nhưng sau khi tăng cường ca trực lên 2 người (12 ca/giờ) và siết ngân sách 300.000đ, kết quả after đạt 0 ca ùn, thời gian chờ tối đa giảm về 15 phút, tổng hoàn 292.000đ nằm trong hạn mức, chi phí 7.296đ và ROI 0.37 vẫn đảm bảo hiệu quả kinh tế.
-- Report tự kiểm tra: mã lần chạy `R-S4-grade-20261119-184336-c4c041` · ô nào còn đỏ (nguyên nhân × tầng): Không có ô nào còn đỏ (Cả 6 mục kiểm tra integrity, criteria, visible, regression, monitor đều đạt ✅).
+- Report tự kiểm tra: mã lần chạy `R-S4-grade-20261119-203141-c4c041` · ô nào còn đỏ (nguyên nhân × tầng): Không có ô đỏ. 5/6 mục đạt ✅ (integrity, criteria, visible, regression, monitor); mục 4 (hidden) chưa chạy vì máy không có bài kiểm tra ẩn, team chấm sẽ chạy sau.
 - Cổng vòng 1 (mốc prepared) đã đỡ được gì trước khi bàn biết sự cố, và bỏ sót gì: Cổng vòng 1 đã chặn đứng triệt để lỗi bồi hoàn sai và phạt oan hãng do LLM fail-open khi gặp HTTP 429; nhưng bỏ sót việc kiểm soát tải dồn giờ cao điểm (gây ùn tắc hàng chờ) và chưa cập nhật hạn mức ngân sách ngày sale (trần cũ 2 triệu > 300k).
 - Report ghi "được phép cân nhắc Tiếp tục" hay "không đủ căn cứ"? Quyết định của bàn có khớp không: Report ghi rõ "Được phép cân nhắc 'Tiếp tục'". Quyết định của nhóm hoàn toàn khớp với khuyến nghị và bằng chứng thực nghiệm của report.
 - Một thứ bộ thử hôm nay chưa đo, và nó ảnh hưởng quyết định ra sao: Bộ thử chưa đo thời gian xử lý thực tế phân tán theo từng ca phức tạp và sự biến động tâm lý/năng suất của con người khi trực ca đêm; nếu thời gian xử lý thực tế kéo dài hơn 5 phút/ca, năng lực 12 ca/giờ có thể bị suy giảm, đòi hỏi quy trình trực dự phòng on-call như đã thiết lập trong Runbook.

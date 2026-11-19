@@ -16,7 +16,6 @@ Họ tên đầy đủ và MSSV của **mọi** thành viên; bàn 3 người th
 |   1 | Lê Thành Nguyên | 2A202603733 | Kỹ sư cổng | x |
 |   2 | Lê Hải Anh | 2A202603986 | Sản phẩm và kinh doanh |             |
 |   3 | Nguyễn Minh Đức | 2A202603960 | Vận hành và pháp lý |             |
-|   4 |           |      |     |             |
 
 Ghi `members` trong `submission/submission.json` theo dạng `"HoVaTen-MSSV"`, khớp bảng trên.
 
@@ -92,16 +91,16 @@ Vận hành và pháp lý (Ops & Legal), điều phối nộp bài và Git; rà 
 
 - Đánh giá tác động vận hành và pháp lý sau khi nhận thẻ S4: phân tích rủi ro ùn tắc hàng chờ (queue stuck), vượt thời gian chờ tối đa (SLA 60 phút) khi dồn tải giờ cao điểm ngày sale 11.11, và nguy cơ vượt hạn mức chi trả của doanh nghiệp.
 - Tham gia hoàn thiện bảng tổng hợp sửa lỗi C7: hệ thống hóa các biện pháp kỹ thuật vòng 1 (giữ cổng entitlement DB và quy lỗi hãng), tầng hạn mức tài chính (hạ daily refund cap xuống 300.000đ và loại trừ khoản đã duyệt), tầng vận hành (tăng công suất 2 người trực / 12 ca/giờ) và tầng phát hiện (monitor `peak_hour_review_count`).
-- Hoàn thiện mục B7.6 (Giờ cao điểm) trong Phiếu B: xác định ngưỡng tải 15–20 ticket/giờ, phân bổ 2 người trực, quy định rõ ràng ngưỡng cảnh báo, ngưỡng huy động người hỗ trợ và ngưỡng kích hoạt công tắc ngắt khẩn cấp.
-- Xây dựng Risk Register (C10): xác định rủi ro vắng mặt nhân sự hoặc ca phức tạp kéo dài làm giảm năng lực duyệt thực tế xuống dưới 12 ca/giờ; chỉ định metric theo dõi `peak_hour_review_count` (> 12 ca/giờ) và `queue_wait_max_min` (> 45 phút) với quy trình ứng phó on-call dự phòng cụ thể do cá nhân phụ trách (PIC).
-- Cập nhật checklist 9 nhóm việc và viết chi tiết Runbook phần 4 (rút kinh nghiệm sau S4) & Runbook 5 (3 kịch bản ứng phó sự cố khẩn cấp kèm cú pháp công tắc an toàn `"issue_refund": "off"` và điều kiện khôi phục `"on"`).
+- Hoàn thiện mục B7.6 (Giờ cao điểm) trong Phiếu B: tải giờ cao điểm, phân bổ 2 người trực, ngưỡng gọi thêm người và ngưỡng thu hẹp phạm vi pilot, chi phí/ROI khi thêm người.
+- Xây dựng Risk Register (C10): xác định rủi ro vắng mặt nhân sự hoặc ca phức tạp kéo dài làm giảm năng lực duyệt thực tế xuống dưới 12 ca/giờ. Metric theo dõi: `peak_hour_review_count` (> 12 ca/giờ) hoặc `queue_wait_max_min` (> 30 phút) thì gọi on-call; chờ >= 45 phút hoặc `queue_stuck` >= 1 thì thu hẹp `pilot_scope`; mỗi mức có PIC.
+- Cập nhật checklist 9 nhóm việc và viết chi tiết Runbook phần 4 (rút kinh nghiệm sau S4) & Runbook 5 (3 kịch bản ứng phó, kèm cú pháp công tắc `"off"`/`"on"` khi một thao tác ghi bị nghi sai).
 - Đánh giá và chốt quyết định Gate 1 v2 (C12): phân tích số liệu sau can thiệp (0 ca ùn, chờ lâu nhất 15 phút, hoàn ngày 292.000đ, ROI 0.37, chi phí 7.296đ/ticket, không có lỗi PII hay oan hãng); đối chiếu tiêu chí và bảo vệ quyết định "Tiếp tục". Soạn thảo 3 dòng bắt buộc cho hồ sơ nộp bài.
 - Thực hiện kiểm tra toàn diện quy chuẩn nộp bài, chạy `lab10.check_submission --collect`, rà soát tính nhất quán giữa TEAM.md, Form B, Form C và submission.json.
 
 ### Bằng chứng
 
-- Mã commit: `c53f7c0` (nhận thẻ S4), các commit chốt vận hành và nộp bài trên nhánh `duc-s4`.
-- Mã lần chạy đối chiếu: Grade cuối `R-S4-grade-20261119-184336-c4c041` (PASS-VISIBLE), mốc after `R-S4-after-20261119-184341-c4c041`, mốc prepared `R-S4-prepared-20261119-184341-c4c041`.
+- Mã commit: `cd43b52` (`docs: complete S4 operations and final submission`, nhánh `duc-s4`, tác giả MSSV `2A202603960`), merge vào `main` qua PR #2 (`a16d5a3`).
+- Mã lần chạy: grade do Đức chạy khi gom bài `R-S4-grade-20261119-194037-c4c041` (PASS-VISIBLE; ba mốc `R-S4-before/prepared/after-20261119-194038-c4c041`); đối chiếu với grade sau sửa của Hải Anh `R-S4-grade-20261119-184336-c4c041` (cùng code hash `c4c041`, số liệu trùng).
 - Báo cáo và phiếu: Mục B7.6 (Phiếu B); mục C7, C10, C11, C12 (Phiếu C); hồ sơ `submission/submission.json`.
 - Kiểm thử và nộp bài: `python -m unittest discover -s tests`, `python -m lab10.grade --incident S4`, `python -m lab10.check_submission --collect`, `python -m lab10.check_submission`.
 
