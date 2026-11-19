@@ -54,7 +54,7 @@ Kỹ sư cổng (Gate Engineer) và Trưởng nhóm; phụ trách chạy đánh 
 
 ### Phần việc phụ trách
 
-Sản phẩm và kinh doanh; câu 1.1, 1.6 (Phiếu A mục A1, A4), câu 2.3, 2.9 và quyết định v1 (Phiếu B mục B3, B7.4, B8), câu 3.2, phần `business` của câu 3.5 và quyết định v2 (Phiếu C mục C5, C7, C12); file `config/acceptance_criteria.json`, `config/operating_gates.json` mục `business`.
+Sản phẩm và kinh doanh, phụ trách vòng 2 sau khi nhận thẻ S4; phân tích ngân sách, chi phí/ROI; điều chỉnh trần hoàn và năng lực duyệt trong config/operating_gates.json; bổ sung guard, monitor và chạy đánh giá/kiểm thử; thực hiện Phiếu C các mục C0, C1, C2, C4, C5, C6, C8, C9; bàn giao bằng chứng để hoàn thiện hồ sơ và quyết định v2.
 
 ### Đóng góp cụ thể
 
@@ -66,21 +66,16 @@ Sản phẩm và kinh doanh; câu 1.1, 1.6 (Phiếu A mục A1, A4), câu 2.3, 2
 - Thêm và đăng ký monitor `peak_hour_review_count` trong `lab10/monitors.py`, đếm số ca cần duyệt cao nhất theo giờ đến, tách riêng seed và ngày. Ghi công thức, ngưỡng cảnh báo và điểm mù; giá trị ở after: bộ nền 1, S4 16 ca/giờ.
 - Thực hiện đánh giá sau từng thay đổi, kiểm regression bộ nền và hash file khóa; bổ sung 10 test cho monitor và trần ngân sách, chạy 13 test công khai; xử lý các phát hiện từ review độc lập. Kết quả cuối PASS-VISIBLE, không regression, hoàn sai/ghi oan hãng/PII đều bằng 0; chưa có test ẩn trên máy.
 - Hoàn thiện Phiếu C các mục C0, C1, C2, C4, C5, C6, C8, C9 bằng mã chạy và số liệu thực tế; chưa chốt C7, C10, C11, C12, quyết định v2 hoặc gom bài cuối.
-- Viết hướng dẫn bàn giao chi tiết cho Đức và cập nhật `.gitignore` cho tài liệu, test và log tham khảo cục bộ; giữ các file nguồn và thành phần bài nộp bắt buộc.
 
 ### Bằng chứng
 
-- Mã commit cho phần xử lý B/S4: `c7eac27` — `fix: handle S4 refund budget and peak review load` (nhánh `haianh`, tác giả MSSV `2A202603986`); gồm code guard/monitor, config ngân sách/năng lực duyệt, Phiếu C và `.gitignore`. Phần tổng hợp đóng góp và exit ticket trong `TEAM.md` được lưu ở commit hồ sơ tiếp theo.
+- Mã commit cho phần xử lý B/S4: `c7eac27` — `fix: handle S4 refund budget and peak review load` (nhánh `haianh`, tác giả MSSV `2A202603986`); gồm code guard/monitor, config ngân sách/năng lực duyệt. 
 - Grade trước sửa: `R-S4-grade-20261119-183557-d6f9c7` — còn vượt ngân sách, hàng chờ và chưa có monitor mới.
 - Thử riêng trần 300.000đ: `R-S4-after-20261119-183734-3b3fff`; thử năng lực 2 người/12 ca mỗi giờ: `R-S4-after-20261119-183741-496088`; kiểm bộ nền: `R-base-after-20261119-183745-496088`.
 - Grade cuối: `R-S4-grade-20261119-184336-c4c041` — PASS-VISIBLE (chưa chạy test ẩn); integrity, criteria, visible, regression và monitor đều đạt.
 - Ba mốc S4 cuối: base `R-S4-before-20261119-184340-c4c041`; prepared `R-S4-prepared-20261119-184341-c4c041`; after `R-S4-after-20261119-184341-c4c041`. Report và nhật ký hiện ở `runs/`, cần được gom vào `submission/` ở bước nộp bài.
-- Code/config: `lab10/guards.py`, `lab10/monitors.py`, `config/operating_gates.json`; báo cáo: `templates/form-c-incident.md` mục C0/C1/C2/C4/C5/C6/C8/C9; quy tắc file tham khảo: `.gitignore`.
-- Kiểm thử đã thực hiện: `python -m unittest discover -s tests` (13 test đạt), `python -m unittest discover -s docs/s4-audit -p test_s4.py` (10 test đạt), `python -m lab10.grade --incident S4`, `git diff --check`. Test bổ sung và hướng dẫn bàn giao là file tham khảo cục bộ đã gitignore, không phải thành phần bắt buộc của bài nộp.
-
-### Sử dụng AI
-
-- Dùng Codex hỗ trợ đọc code và card S4, phân tích trace/report, triển khai thay đổi config/guard/monitor, chạy test và audit, soạn nội dung Phiếu C, hướng dẫn bàn giao và exit ticket. Nội dung đóng góp phần B được tổng hợp theo yêu cầu của Lê Hải Anh; các con số và quyết định cuối cần được nhóm hiểu, kiểm tra và giải thích khi demo theo `RULES.md`.
+- Code/config: `lab10/guards.py`, `lab10/monitors.py`, `config/operating_gates.json`; báo cáo: `templates/form-c-incident.md` mục C0/C1/C2/C4/C5/C6/C8/C9;
+- Kiểm thử đã thực hiện: `python -m unittest discover -s tests` (13 test đạt), `python -m unittest discover -s docs/s4-audit -p test_s4.py` (10 test đạt), `python -m lab10.grade --incident S4`, `git diff --check`. 
 
 ### Exit ticket
 
