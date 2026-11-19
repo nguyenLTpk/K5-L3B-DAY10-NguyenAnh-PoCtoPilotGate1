@@ -1,6 +1,6 @@
 # Phiếu C · Sự cố và quyết định v2 · Khối 3 (phút 125–200)
 
-**Bàn:** ______ · **Thẻ đã bốc:** ___ *(để trống tới phút 125; bốc số xong thì ghi đúng số đó, ví dụ `S3`. Lab Coach đối chiếu với sổ; lệnh tự kiểm tra in dòng này trong report.)*
+**Bàn:** K5-L3B-DAY10-NguyenAnh-PoCtoPilotGate1 · **Thẻ đã bốc:** S4 *(để trống tới phút 125; bốc số xong thì ghi đúng số đó, ví dụ `S3`. Lab Coach đối chiếu với sổ; lệnh tự kiểm tra in dòng này trong report.)*
 
 Mở `incidents/Sx/card.md` của đúng số đã bốc. Các bước trên thẻ trỏ về đúng mục trong phiếu này. Mục C3 chỉ điền phần ứng với
 số thẻ của bàn; các phần khác để trống.
@@ -279,9 +279,10 @@ python3 -m lab10.grade --incident Sx
 
 | Nhánh fault tree | Nguyên nhân | Chỗ sửa (hàm + nhánh trong `guards.py`, hoặc khoá trong `operating_gates.json`) | Tầng (phát hiện / chặn / giới hạn thiệt hại / vận hành) | GIẢM khả năng hay NGĂN hẳn? Vì sao | Mã lần chạy sau khi sửa |
 |---|---|---|---|---|---|
-| [1] | | | | | |
-| [2] | | | | | |
-| [3] | | | | | |
+| [1] | LLM fail-open khi policy_check lỗi (429) dẫn đến bồi hoàn sai và phạt oan hãng vận chuyển | Giữ nguyên cổng kiểm tra `write_gate` (kiểm tra `db_delay_days` của tracking DB cho `issue_refund` và `carrier_at_fault` cho `file_carrier_fault`) | Chặn | **NGĂN HẲN** các khoản hoàn sai và phạt oan hãng có bằng chứng trái với DB nội bộ vì mọi lệnh ghi đều bị chặn cứng tại write_gate trước khi thực thi | `R-base-after-20261119-151630-a89d4b` (vòng 1) · `R-S4-after-20261119-184341-c4c041` (vòng 2) |
+| [2] | Ngân sách ngày sale Finance quy định 300.000đ nhưng config cũ đặt 2.000.000đ; đồng thời trần tự động chặn nhầm cả các khoản đã có phê duyệt | 1. Sửa `config/operating_gates.json`: `business.daily_refund_cap_vnd = 300000`<br>2. Sửa `lab10/guards.py`: trong `write_gate`, logic trần ngân sách chỉ áp dụng khi `not action.get("approval_id")` | Giới hạn thiệt hại | **NGĂN HẲN** việc tự động hoàn vượt ngân sách 300.000đ/ngày trong mô phỏng (thực tế hoàn ngày đạt 292.000đ), đồng thời cho phép các khoản bồi hoàn hợp lệ đã được trưởng ca duyệt (`approval_id`) được chi trả | `R-S4-after-20261119-183734-3b3fff` (hạ trần) · `R-S4-after-20261119-184341-c4c041` (loại trừ approval) |
+| [3] | Lượng ticket dồn giờ cao điểm đêm sale 11.11 vượt quá năng lực xử lý của 1 nhân sự trực (6 ca/giờ), gây nghẽn hàng chờ | Sửa `config/operating_gates.json`: tăng `operations.reviewers_on_shift = 2`, `operations.review_capacity_per_hour = 12` | Vận hành | **GIẢM KHẢ NĂNG** ùn tắc đối với phân phối tải đo được trong kịch bản S4 (thực tế giảm số ca ùn từ 5 ca xuống 0 ca, thời gian chờ lâu nhất giảm từ 82 phút xuống 15 phút <= 60 phút SLA); không ngăn được nếu tải thực tế tăng vượt quá 12 ca/giờ | `R-S4-after-20261119-183741-496088` (tăng nhân sự) · `R-S4-after-20261119-184341-c4c041` |
+| [3 - Bổ trợ] | Thiếu cơ chế giám sát tải người duyệt theo khung giờ để phát hiện sớm nguy cơ quá tải ca trực | Thêm và đăng ký monitor `peak_hour_review_count` trong `lab10/monitors.py` | Phát hiện | **KHÔNG TỰ NGĂN ÙN** mà phát hiện và cảnh báo sớm khi tải cần duyệt trong giờ cao điểm vượt ngưỡng năng lực phục vụ (ngưỡng 12 ca/giờ); cung cấp tín hiệu để vận hành kịp thời điều động người on-call | `R-S4-after-20261119-184341-c4c041` |
 
 ---
 
@@ -336,7 +337,8 @@ An toàn/hiệu quả cuối: pass_rate=pass_k=1 trên nền/S4; PII=0; chi phí
 
 | Rủi ro | Khả năng | Tác động | Người phụ trách (PIC, một người) | Dấu hiệu (metric nào, ngưỡng nào) | Xử lý | Ảnh hưởng bước đánh giá | Nhóm chức năng (GOVERN / MAP / MEASURE / MANAGE) |
 |---|---|---|---|---|---|---|---|
-| | | | | | | | |
+| Một nhân viên duyệt vắng mặt đột xuất hoặc thời gian thẩm định thực tế kéo dài làm năng lực duyệt thực tế tụt dưới 12 ca/giờ, gây ùn tắc hàng chờ trong đêm sale | Trung bình | Cao (vi phạm cam kết SLA 60 phút, khách hàng phàn nàn) | Nguyễn Minh Đức | `peak_hour_review_count` > 12 ca/giờ kết hợp `queue_wait_max_min` > 45 phút (hoặc `queue_stuck` >= 1) | Kích hoạt nhân sự on-call dự phòng (ca 3) trong vòng 15 phút; nếu không kịp điều động, tạm chuyển `"issue_refund": "off"` hoặc thu hẹp scope sang kho tải thấp để ưu tiên xả hàng chờ | Cho phép tiếp tục pilot nhưng bắt buộc thiết lập quy trình trực dự phòng on-call và giám sát SLA chặt chẽ theo từng giờ | MANAGE |
+| Ngân sách bồi hoàn trong ngày của Finance bị thay đổi đột xuất mà không đồng bộ kịp vào file cấu hình hệ thống | Thấp | Cao (vượt hạn mức tài chính được cấp phép) | Lê Hải Anh | `auto_refund_day_max_vnd` chạm ngưỡng 90% trần quy định (>= 270.000đ khi trần là 300.000đ) | Kích hoạt cảnh báo tới phòng Tài chính; nếu đạt 100% trần, write_gate tự động từ chối mọi lệnh hoàn tiền tự động phát sinh mới và chuyển toàn bộ sang hàng chờ duyệt có thẩm định | Duy trì giám sát đối soát tài chính hàng ngày trước khi mở rộng quy mô pilot | GOVERN |
 
 Quy tắc: **mỗi dòng phải đổi được một quyết định.** Cột "Dấu hiệu" phải là một metric có trong `monitors.py` hoặc trong report.
 
@@ -352,26 +354,45 @@ Ghi các dòng đổi sau sự cố. Mỗi dòng vẫn phải có một PIC có 
 
 | # nhóm | Trạng thái mới (Xong / Chưa / Không áp dụng) | Bằng chứng mới (mã lần chạy, mục phiếu, số trong report) | PIC |
 |---|---|---|---|
-| | | | |
-| | | | |
+| Nhóm 1: Con người & ca trực | Xong | Cấu hình 2 người trực / 12 ca/giờ tại `operating_gates.json`; kết quả chạy mốc after `R-S4-after-20261119-184341-c4c041` ghi nhận 0 ca ùn, chờ lâu nhất 15 phút <= 60 phút SLA. | Lê Thanh Tùng (`NV-TUNG`) |
+| Nhóm 2: Ngân sách & tài chính | Xong | Cập nhật `daily_refund_cap_vnd = 300000`; `write_gate` loại trừ khoản có `approval_id`; tổng hoàn thực tế 292.000đ <= 300.000đ; chi phí 7.296đ/ticket, ROI 0.37. | Lê Hải Anh |
+| Nhóm 5: Giám sát & cảnh báo | Xong | Bổ sung monitor `peak_hour_review_count` trong `lab10/monitors.py`; kiểm thử 13 unit tests và test bộ môn đạt 100%; đèn báo sáng 16 ca/giờ trên bộ S4. | Lê Thành Nguyên |
+| Nhóm 9: Hồ sơ nộp bài & Runbook | Xong | Hoàn thiện runbook giờ cao điểm B7.6, cập nhật Runbook 4 & Runbook 5 với 3 kịch bản; hồ sơ `submission.json` và TEAM.md đã đồng bộ. | Nguyễn Minh Đức |
 
 ### Runbook 4 · Sau sự cố trên thẻ (vòng 2)
 
 | Câu hỏi | Trả lời |
 |---|---|
-| Tín hiệu nào ở Runbook 2 (Phiếu B mục B7.5) lẽ ra phải báo trước sự cố này? Nó đã có chưa? | |
-| Bàn thêm hoặc đổi ngưỡng nào, từ bao nhiêu thành bao nhiêu? | |
-| Bàn đổi gì về **người** (số người trực, ai đứng tên, ai được gọi)? | |
-| Bàn đổi gì về **phạm vi** hoặc **quy trình** (kiểm mẫu, ghi chú giải thích, trần)? | |
-| Nói gì với bên thứ ba bị ảnh hưởng (hãng, shop, người nhận, nhân viên duyệt), ai nói, trong bao lâu? | |
-| Dữ liệu cá nhân nào đã rời hệ thống mà không thu hồi được? Báo cho ai? | |
-| Sự cố lộ ra trước qua số máy đo, phản hồi của người, hay đọc nội dung? Nguồn nào bàn chưa có? | |
+| Tín hiệu nào ở Runbook 2 (Phiếu B mục B7.5) lẽ ra phải báo trước sự cố này? Nó đã có chưa? | Tín hiệu thời gian chờ tối đa `queue_wait_max_min` và số ca bị ùn `queue_stuck`. Trước khi có thẻ S4, hệ thống chỉ đo sau khi chạy xong mà chưa có monitor giám sát mật độ tải dồn theo khung giờ (lúc đó chưa có chỉ số theo dõi tải giờ cao điểm). |
+| Bàn thêm hoặc đổi ngưỡng nào, từ bao nhiêu thành bao nhiêu? | Hạ trần ngân sách bồi hoàn tự động `daily_refund_cap_vnd` từ 2.000.000đ xuống 300.000đ/ngày; tăng năng lực phục vụ từ 1 người (6 ca/giờ) lên 2 người (12 ca/giờ); bổ sung ngưỡng cảnh báo tải `peak_hour_review_count` > 12 ca/giờ. |
+| Bàn đổi gì về **người** (số người trực, ai đứng tên, ai được gọi)? | Tăng nhân sự trực ca cao điểm từ 1 lên 2 người trực đồng thời (Trần Thị Hạnh `NV-HANH` và 1 CSKH tăng cường); người chịu trách nhiệm trực on-call dự phòng hỗ trợ khi quá tải: Lê Thanh Tùng (`NV-TUNG`). |
+| Bàn đổi gì về **phạm vi** hoặc **quy trình** (kiểm mẫu, ghi chú giải thích, trần)? | Giữ nguyên tỷ lệ kiểm mẫu ngẫu nhiên 10% và ghi chú giải thích `decision_note = true`; sửa quy trình write_gate để trần bồi hoàn tự động chỉ áp dụng cho lệnh không có `approval_id`, không chặn nhầm lệnh đã được duyệt thủ công. |
+| Nói gì với bên thứ ba bị ảnh hưởng (hãng, shop, người nhận, nhân viên duyệt), ai nói, trong bao lâu? | Đại diện vận hành (Phạm Kiều Oanh `NV-OANH`) thông báo trong vòng 24 giờ cho hãng vận chuyển xác nhận không có quyết định bồi hoàn sai hay ghi lỗi oan phát sinh (oan hãng = 0); thông báo nội bộ cho nhân viên duyệt về việc phân công ca đôi giờ cao điểm. |
+| Dữ liệu cá nhân nào đã rời hệ thống mà không thu hồi được? Báo cho ai? | Không có dữ liệu cá nhân nào rời khỏi hệ thống (chỉ số `pii_leaks = 0` trên toàn bộ các mốc kiểm thử base, prepared, after). Không cần kích hoạt quy trình báo cáo rò rỉ dữ liệu. |
+| Sự cố lộ ra trước qua số máy đo, phản hồi của người, hay đọc nội dung? Nguồn nào bàn chưa có? | Sự cố lộ ra trước qua số máy đo mô phỏng của bộ công cụ đánh giá kiểm thử (`lab10.grade`). Nguồn nhóm chưa có trong môi trường thực tế là dữ liệu telemetry thời gian thực về thời gian thao tác từng ca của nhân viên duyệt. |
 
 ### Runbook 5 · Ba kịch bản "nếu … thì …" cho tuần đầu chạy thử thật
 
-1. Nếu số ticket tăng gấp ___ lần trong một giờ thì: …
-2. Nếu nhà cung cấp LLM lỗi quá ___ phút thì: …
-3. Nếu người duyệt báo không tin một quyết định của trợ lý thì: …
+1. **Nếu số ticket tăng gấp 3 lần trong một giờ (đạt trên 15 ticket/giờ hoặc monitor `peak_hour_review_count` > 12):**
+   - *Ngưỡng kích hoạt:* `peak_hour_review_count` > 12 hoặc `queue_wait_max_min` > 30 phút.
+   - *Người phụ trách:* Trần Thị Hạnh (`NV-HANH`) và Lê Thanh Tùng (`NV-TUNG`).
+   - *Hành động:* Kích hoạt ngay nhân sự trực dự phòng on-call để nâng công suất lên 18 ca/giờ. Nếu sau 15 phút chưa có người bổ sung hoặc hàng chờ tiếp tục tăng chạm 45 phút, chuyển công tắc trong `config/switches.json`: `"issue_refund": "off"` để tạm dừng cấp tiền tự động, giảm tải kiểm mẫu.
+   - *Cách xử lý ticket đang chờ:* Tất cả ticket đang xếp hàng được phân loại tự động: ưu tiên xử lý ticket khiếu nại gấp, các ticket còn lại chuyển sang chế độ phản hồi hẹn khách hàng trong 120 phút.
+   - *Điều kiện bật lại:* Khi mật độ ticket về dưới 10 ca/giờ và thời gian chờ tối đa dưới 20 phút; PIC vận hành kiểm tra hàng chờ ổn định thì đổi lại `"issue_refund": "on"`.
+
+2. **Nếu nhà cung cấp LLM lỗi kéo dài quá 5 phút (liên tục trả về HTTP 429 hoặc 5xx):**
+   - *Ngưỡng kích hoạt:* Tỷ lệ lỗi gọi LLM policy_check >= 3 lần liên tiếp hoặc gián đoạn >= 5 phút.
+   - *Người phụ trách:* Kỹ sư cổng Lê Thành Nguyên phối hợp giám sát Lê Thanh Tùng.
+   - *Hành động:* Cơ chế fallback an toàn tự động chuyển toàn bộ ticket khiếu nại sang trạng thái chờ duyệt tay (Human Escalation), tuyệt đối không để LLM fail-open tự động chấp thuận bồi hoàn. Đồng thời ghi nhận log sự cố và chuyển hướng sang mô hình dự phòng (nếu có).
+   - *Cách xử lý ticket đang chờ:* Lưu ticket vào hàng đợi bền vững (persistent queue), gửi thông báo tự động tới khách hàng "Hệ thống đang kiểm tra thông tin với đối tác vận chuyển, phản hồi sẽ gửi trong ít phút".
+   - *Điều kiện bật lại:* Dịch vụ LLM khôi phục và kiểm thử ping kiểm tra thành công ít nhất 10 request liên tiếp không gặp lỗi; Kỹ sư cổng xác nhận hạ tầng ổn định.
+
+3. **Nếu người duyệt báo không tin một quyết định của trợ lý (nghi ngờ hallucination hoặc sai lệch logic bồi hoàn):**
+   - *Ngưỡng kích hoạt:* Có >= 1 phản ánh từ nhân viên duyệt hoặc kết quả kiểm mẫu 10% phát hiện ca bất thường.
+   - *Người phụ trách:* Trưởng ca Trần Thị Hạnh (`NV-HANH`) và Kỹ sư cổng Lê Thành Nguyên.
+   - *Hành động:* Trưởng ca bấm giữ ticket để thẩm định độc lập; nếu phát hiện sai sót logic hệ thống, lập tức chuyển công tắc thao tác liên quan trong `config/switches.json` thành `"off"` (ví dụ `"file_carrier_fault": "off"` hoặc `"issue_refund": "off"`).
+   - *Cách xử lý ticket đang chờ:* Tạm dừng phân phối tự động loại nghiệp vụ đang bị nghi ngờ; chuyển toàn bộ ticket cùng loại sang phê duyệt thủ công có xác nhận 2 bước.
+   - *Điều kiện bật lại:* Nhóm kỹ thuật phân tích trace của ticket, xác định nguyên nhân gốc, cập nhật guardrail/bổ sung test case trong `lab10/guards.py`, kiểm thử vượt qua toàn bộ test hồi quy; Kỹ sư cổng và Trưởng ca cùng phê duyệt bật lại `"on"`.
 
 ---
 
@@ -385,30 +406,30 @@ Cột v1 nằm ở Phiếu B mục B8; không sửa cột đó.
 
 | | **v2** (phút 185–200, SAU sự cố) |
 |---|---|
-| Commit ký tiêu chí | phải giống v1 |
-| Hash chốt cổng vòng 1 | phải giống v1 |
-| Mã lần chạy dùng làm bằng chứng | thẻ, mốc base: ________ · prepared: ________ · after: ________ |
-| Còn dòng "vượt trần" nào trong report? (hàng chờ, chi phí, ROI, trần tiền, pháp lý) | |
-| Kho hoặc hãng có số xấu nhất: ____. Nếu chỉ nhìn phân khúc này, quyết định có đổi không? *(Khối "theo kho và hãng" trong output `lab10.eval` / `lab10.grade`, hoặc mục `by_segment` trong `report.json`.)* | |
-| Quyết định (khoanh một) | Tiếp tục · Thu hẹp · Cải tiến thêm · Dừng |
-| Bằng chứng 1: mã lần chạy + chỉ số bắt buộc nào đạt / chưa | |
-| Bằng chứng 2 | |
-| Bằng chứng 3 | |
-| Khớp dòng nào trong `decision_rule` đã ký? | |
-| Nếu Thu hẹp: cắt kho nào / còn bao nhiêu phần trăm / mấy người trực, và ticket bị cắt đi đâu | |
-| Nếu Cải tiến thêm: giả thuyết cụ thể (nhánh nào của fault tree) + hạn | |
-| Nếu Dừng: bài học ghi lại | |
-| Ngày quyết định lại (trừ khi Dừng) | |
-| PIC ký | |
+| Commit ký tiêu chí | 40ac3a0 |
+| Hash chốt cổng vòng 1 | 63ed076c |
+| Mã lần chạy dùng làm bằng chứng | thẻ, mốc base: `R-S4-before-20261119-184340-c4c041` · prepared: `R-S4-prepared-20261119-184341-c4c041` · after: `R-S4-after-20261119-184341-c4c041` |
+| Còn dòng "vượt trần" nào trong report? (hàng chờ, chi phí, ROI, trần tiền, pháp lý) | Không còn dòng nào vượt trần. Hàng chờ 0 ca ùn, chờ lâu nhất 15 phút <= 60 phút; hoàn ngày 292.000đ <= 300.000đ; chi phí 7.296đ <= 8.500đ; ROI 0.37 >= 0.15; PII = 0; oan hãng = 0. |
+| Kho hoặc hãng có số xấu nhất: Kho DN (chi phí 7.568đ/ticket, cao nhất nhưng vẫn < 10.000đ làm tay; pass 1.0; 0 hoàn sai, 0 oan hãng). Nếu chỉ nhìn phân khúc này, quyết định có đổi không? | Quyết định không đổi: Phân khúc Kho DN vẫn tạo ra giá trị kinh tế (tiết kiệm hơn so với 10.000đ làm tay) và an toàn tuyệt đối về pháp lý/tiền bạc. |
+| Quyết định (khoanh một) | **Tiếp tục** |
+| Bằng chứng 1: mã lần chạy + chỉ số bắt buộc nào đạt / chưa | `R-S4-grade-20261119-184336-c4c041`: PASS-VISIBLE; `pass_rate` = 1.0 (ĐẠT >= 0.85), `pass_k` = 1.0 (ĐẠT >= 0.75). |
+| Bằng chứng 2 | `wrongful_refund_vnd` = 0đ (ĐẠT), `wrongful_carrier_faults` = 0 (ĐẠT), `pii_leaks` = 0 (ĐẠT) trên cả bộ nền và bộ S4. |
+| Bằng chứng 3 | `queue_stuck` = 0 (ĐẠT), `queue_wait_max_min` = 15.0 phút <= 60 phút (ĐẠT), tổng hoàn tự động ngày = 292.000đ <= 300.000đ ngân sách (ĐẠT), `cost_per_ticket_vnd` = 7.296đ <= 8.500đ (ĐẠT), `roi` = 0.37 >= 0.15 (ĐẠT). |
+| Khớp dòng nào trong `decision_rule` đã ký? | Khớp dòng **Tiếp tục**: "Toàn bộ 5 chỉ số bắt buộc đạt trên bộ nền và gói sự cố, không có ca rò rỉ PII hay lỗi oan hãng, chi phí dưới 8.500đ/ticket và không có ca nào bị ùn tắc hàng chờ." |
+| Nếu Thu hẹp: cắt kho nào / còn bao nhiêu phần trăm / mấy người trực, và ticket bị cắt đi đâu | (Không áp dụng) |
+| Nếu Cải tiến thêm: giả thuyết cụ thể (nhánh nào của fault tree) + hạn | (Không áp dụng) |
+| Nếu Dừng: bài học ghi lại | (Không áp dụng) |
+| Ngày quyết định lại (trừ khi Dừng) | 2026-11-26 |
+| PIC ký | Lê Hải Anh (Product) & Nguyễn Minh Đức (Ops) |
 
 **Chỉ ở v2**
-- Quyết định đổi hay giữ so với v1? Vì con số nào: …
-- Report tự kiểm tra: mã lần chạy `__________` · ô nào còn đỏ (nguyên nhân × tầng): …
-- Cổng vòng 1 (mốc prepared) đã đỡ được gì trước khi bàn biết sự cố, và bỏ sót gì: …
-- Report ghi "được phép cân nhắc Tiếp tục" hay "không đủ căn cứ"? Quyết định của bàn có khớp không: …
-- Một thứ bộ thử hôm nay chưa đo, và nó ảnh hưởng quyết định ra sao: …
+- Quyết định đổi hay giữ so với v1? Vì con số nào: **Giữ nguyên quyết định "Tiếp tục"** như v1. Mặc dù sự cố S4 ban đầu gây ra 5 ca ùn tắc và chờ tối đa 82 phút ở prepared, nhưng sau khi tăng cường ca trực lên 2 người (12 ca/giờ) và siết ngân sách 300.000đ, kết quả after đạt 0 ca ùn, thời gian chờ tối đa giảm về 15 phút, tổng hoàn 292.000đ nằm trong hạn mức, chi phí 7.296đ và ROI 0.37 vẫn đảm bảo hiệu quả kinh tế.
+- Report tự kiểm tra: mã lần chạy `R-S4-grade-20261119-184336-c4c041` · ô nào còn đỏ (nguyên nhân × tầng): Không có ô nào còn đỏ (Cả 6 mục kiểm tra integrity, criteria, visible, regression, monitor đều đạt ✅).
+- Cổng vòng 1 (mốc prepared) đã đỡ được gì trước khi bàn biết sự cố, và bỏ sót gì: Cổng vòng 1 đã chặn đứng triệt để lỗi bồi hoàn sai và phạt oan hãng do LLM fail-open khi gặp HTTP 429; nhưng bỏ sót việc kiểm soát tải dồn giờ cao điểm (gây ùn tắc hàng chờ) và chưa cập nhật hạn mức ngân sách ngày sale (trần cũ 2 triệu > 300k).
+- Report ghi "được phép cân nhắc Tiếp tục" hay "không đủ căn cứ"? Quyết định của bàn có khớp không: Report ghi rõ "Được phép cân nhắc 'Tiếp tục'". Quyết định của nhóm hoàn toàn khớp với khuyến nghị và bằng chứng thực nghiệm của report.
+- Một thứ bộ thử hôm nay chưa đo, và nó ảnh hưởng quyết định ra sao: Bộ thử chưa đo thời gian xử lý thực tế phân tán theo từng ca phức tạp và sự biến động tâm lý/năng suất của con người khi trực ca đêm; nếu thời gian xử lý thực tế kéo dài hơn 5 phút/ca, năng lực 12 ca/giờ có thể bị suy giảm, đòi hỏi quy trình trực dự phòng on-call như đã thiết lập trong Runbook.
 
 **Ba dòng bắt buộc** (chép nguyên ba câu này sang `submission/submission.json`, mục `three_lines`)
-1. Một giả định về môi trường mà thiết kế của đội đang dựa vào, có thể sai ngoài thực tế: …
-2. Gate của đội chỉ GIẢM khả năng hay thực sự NGĂN được tác hại? Vì sao: …
-3. Vì data là mock, cần đo lại gì trong pilot thật trước Bước đánh giá 2: …
+1. Một giả định về môi trường mà thiết kế của đội đang dựa vào, có thể sai ngoài thực tế: Giả định rằng 2 nhân sự trực luôn có mặt đầy đủ và duy trì đều đặn năng suất xử lý 6 ca/người/giờ (tổng 12 ca/giờ), không bị gián đoạn hay mất tập trung bởi các ticket tranh chấp phức tạp kéo dài.
+2. Gate của đội chỉ GIẢM khả năng hay thực sự NGĂN được tác hại? Vì sao: Cổng `write_gate` kiểm tra quyền lợi và trần tài chính thực sự **NGĂN ĐƯỢC** tác hại tài chính và pháp lý vì lệnh ghi vi phạm bị từ chối ở tầng code; trong khi giải pháp tăng 2 người trực chỉ **GIẢM KHẢ NĂNG** ùn tắc đối với phân phối tải đo được (16 ca/giờ đỉnh) chứ không thể ngăn hoàn toàn nếu tải thực tế tăng đột biến vượt quá 12 ca/giờ.
+3. Vì data là mock, cần đo lại gì trong pilot thật trước Bước đánh giá 2: Cần đo đạc chính xác thời gian xử lý thực tế của nhân viên trên từng ticket phức tạp, tần suất và quy mô đột biến của lưu lượng ticket theo từng khung giờ trong ngày sale, và tỷ lệ không tin tưởng quyết định của trợ lý từ phía nhân viên duyệt thực tế.
